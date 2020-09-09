@@ -8,8 +8,6 @@
 import functools
 import sys
 
-# #############################################
-
 
 @trace
 def foo(x):
@@ -23,7 +21,7 @@ def foo(x):
 
 foo = trace(foo)
 
-# #############################################
+# ###################################################################################
 
 
 def trace(func):
@@ -51,16 +49,18 @@ print(identity.__name__, identity.__doc__)
 
 identity(42)
 
-# #############################################
+# ###################################################################################
 
 # deco = trace(sys.stderr)
 # identity = deco(identity)
+
+
 @trace(sys.stderr)
 def identity(x):
     """ I do nothing usful"""
     return x
 
-# #############################################
+# ###################################################################################
 
 
 def trace(handle):
@@ -85,7 +85,7 @@ def trace(func=None, *, handle=sys.stdout):
         return func(*args, **kwargs)
     return inner
 
-# #############################################
+# ###################################################################################
 
 
 def with_arguments(deco):  # декоратор для декоратора, принимает декоратор
@@ -119,37 +119,3 @@ def trace(func, handle):
 @trace(sys.stderr)
 def identity(x):
     return x
-
-
-# #############################################
-# #############################################
-
-def my_print(func):
-    def zz():
-        return func()
-    return zz
-
-
-@my_print
-def z():
-    return 42
-
-
-z()
-
-# ##########################################
-
-cache = {}
-
-
-def remember(func):
-    def inner(arg):
-        if arg not in cache:
-            cache[arg] = func(arg)
-        return cache[arg]
-    return inner
-
-
-@remember
-def square(x):
-    return x * x
