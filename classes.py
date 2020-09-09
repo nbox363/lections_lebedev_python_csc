@@ -2,26 +2,30 @@ from collections import deque
 
 
 class Counter:
-    "I count. That is all"
+    '''I count. That is all'''
+    all_counters = []               # атрибут класса
 
     def __init__(self, initial=0):  # консруктор
-        self.value = initial  # запись атрибута
+        self.value = initial        # запись атрибута
+        Counter.all_counters.append(self)
 
     def increment(self):
         self.value += 1
 
     def get(self):
-        return self.value  # чтение атрибута
+        return self.value           # чтение атрибута
 
 
 c = Counter(42)
 c.increment()
 c.get()  # 43
 
-########################################################
+
+# ###################################################################################
 
 
 class MemorizingDict(dict):
+    '''Fixes keys'''
     _history = deque(maxlen=10)
 
     def set(self, key, value):
@@ -33,57 +37,75 @@ class MemorizingDict(dict):
 
 
 d = MemorizingDict({'foo': 42})
-d.set('baz', 100500)  # 'baz'
-d.get_history()
+d.set('baz', 100500)
+d.get_history()  # ['baz']
 
 d = MemorizingDict()
-d.set('boo', 500100)  # 'baz', 'boo'
-d.get_history()
-
-########################################################
+d.set('boo', 500100)
+d.get_history()  # ['baz', 'boo']
 
 
-# class Path:
-#    def __init__(self, current):
-#         self.current = current
-
-#     def __repr__(self):
-#         return 'Path({})'.format(self.current)
-
-#     @property
-#     def parent(self):
-#         return Path(dirname(self.current))
+# ###################################################################################
 
 
-# p = Path('./examples/some_file.txt')
-# p.parent
-
-########################################################
-
-
-# class BidDateModel:
-#     def __init__(self):
-#         self._params = []
-
-#     @property
-#     def params(self):
-#         return self._params
-
-#     @params.setter
-#     def params(self, new_params):
-#          assert all(map(lambda p: p > 0, new_params))
-#         self.params = new_params
-
-#     @params.deleter
-#     def params(self):
-#         del self._params
+class Noop:
+    '''Fixed set of attributes'''  # No __dict__
+    __slots__ = ['some_attribute']
 
 
-# model = BidDateModel()
-# model.params = [0.1, 0.5, 0.4]
-# model.params # [0.1, 0.5, 0.4]
+noop = Noop()
+noop.some_attribute = 42
+noop.some_attribute        # 42
+noop.some_other_attribute  # AttrubuteError
 
-########################################################
+
+# ###################################################################################
+
+
+class Path:
+    def __init__(self, current):
+        self.current = current
+
+    def __repr__(self):
+        return 'Path({})'.format(self.current)
+
+    @property
+    def parent(self):
+        return Path(dirname(self.current))
+
+
+p = Path('./examples/some_file.txt')
+p.parent  # Path('./examples/')
+
+
+# ###################################################################################
+
+
+class BidDateModel:
+    def __init__(self):
+        self._params = []
+
+    @property
+    def params(self):
+        return self._params
+
+    @params.setter
+    def params(self, new_params):
+        assert all(map(lambda p: p > 0, new_params))
+        self._params = new_params
+
+    @params.deleter
+    def params(self):
+        del self._params
+
+
+model = BidDateModel()
+model.params = [0.1, 0.5, 0.4]
+model.params  # [0.1, 0.5, 0.4]
+
+
+# ###################################################################################
+
 
 class Noop:
     def __getattr__(self, name):  # вызывается, если атрибута нет
@@ -92,7 +114,8 @@ class Noop:
 
 Noop().foo  # foo
 
-########################################################
+
+# ###################################################################################
 
 
 class Guarded:
@@ -109,4 +132,4 @@ class Noop(Guarded):
     def __init__(self):
         self.__dict__['foobar'] = 42
 
-########################################################
+# ###################################################################################
