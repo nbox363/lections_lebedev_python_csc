@@ -109,7 +109,6 @@ def g():
     yield x
     print('Done')
 
-
 # >>> type(g)
 # class 'function'
 # >>> gen = g()
@@ -187,11 +186,26 @@ class BinaryTree:
 # ###################################################################################
 
 
+gen = (x ** 2 for x in range(10**42) if x % 2 == 1)  # generator object
+
+
+# ###################################################################################
+
+
 def g():
     res = yield
     print(f"Got {res}")
     res = yield 42
     print(f"Got {res}")
+
+# >>> gen = g()
+# >>> next(gen)
+# >>> next(gen)
+# Got 'None'
+# 42
+# >>> next(gen)
+# Got 'None'
+# StopIteration
 
 
 # ###################################################################################
