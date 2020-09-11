@@ -1,3 +1,6 @@
+import sys
+
+
 try:
     something_dangerous()
 except (ValueError, ArithmeticError):
@@ -59,3 +62,37 @@ else:  # выполняется если исключения не было
     report_success(handle)
 except IOError as e:
     print(e, file=sys.stderr)
+
+
+# ###################################################################################
+# ###################################################################################
+
+'''Менеджеры контекста
+
+__enter__, __exit__
+'''
+
+r = acquire_resource()
+
+try:
+    do_something(r)
+finally:
+    release_resource(r)
+
+# эквивалентно
+with acquire_resource() as r:
+    do_something(r)
+
+# логика
+manager = acquire_resource()
+r = manager.__enter__()
+try:
+    do_something(r)
+finally:
+    exc_type, exc_value, tb = sys.exc_info()
+    suppress = manager.__exit__(exc_type, exc_value, tb)
+    if exc_value is not None and not suppress:
+        raise exc_value
+
+
+# ###################################################################################
