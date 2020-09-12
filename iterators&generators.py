@@ -1,4 +1,5 @@
 from itertools import islice
+from functools import wraps
 
 
 ''' Iterators 
@@ -109,16 +110,16 @@ def g():
     yield x
     print('Done')
 
-# >>> type(g)
+>>> type(g)
 # class 'function'
-# >>> gen = g()
+>>> gen = g()
 # class 'generator'
-# >>> next(gen)
+>>> next(gen)
 # Started
 # 42
-# >>> next(gen)
+>>> next(gen)
 # 43
-# >>> next(gen)
+>>> next(gen)
 # Done
 # StopIteration
 
@@ -198,14 +199,31 @@ def g():
     res = yield 42
     print(f"Got {res}")
 
-# >>> gen = g()
-# >>> next(gen)
-# >>> next(gen)
+>>> gen = g()
+>>> next(gen)
+>>> next(gen)
 # Got 'None'
 # 42
-# >>> next(gen)
+>>> next(gen)
 # Got 'None'
 # StopIteration
+
+
+# ###################################################################################
+
+
+def g():
+    try:
+        yield 42
+    finally:
+        print('Done')
+
+
+>>> gen = g()
+>>> next(gen)
+# 42
+>>> gen.close()  # кидает GeneratorExit
+# Done
 
 
 # ###################################################################################
@@ -219,10 +237,25 @@ def grep(pattern):
             print(line)
 
 
-gen = grep("Gotcha!")
-next(gen)  # Loking for 'Gotcha!'
-gen.send("This line doesn't have waht we're looking for")
-gen.send("This one does. Gotcha!")  # This one does. Gotcha!
+>>> gen = grep("Gotcha!")
+>>> next(gen)                           
+# Loking for 'Gotcha!'
+>>> gen.send("This line doesn't have waht we're looking for")
+>>> gen.send("This one does. Gotcha!")  
+This one does. Gotcha!
+
+
+# ###################################################################################
+
+
+def coroutine(g):
+    '''Декоратор, скрывающий вызов next(gen)'''
+    @functools.wraps(g)
+    def inner(*args, **kwargs):
+        gen = g(*args, **kwargs)
+        next(gen)
+        return gen
+    return inner 
 
 
 # ###################################################################################
@@ -232,7 +265,7 @@ gen.send("This one does. Gotcha!")  # This one does. Gotcha!
 
 xs = range(10)
 
-list(islice(xs, 3))  # [1, 2, 3]
+list(islice(xs, 3))        # [1, 2, 3]
 
 list(islice(xs, 3, None))  # [3, 4, 5, 6, 7, 8, 9]
 
