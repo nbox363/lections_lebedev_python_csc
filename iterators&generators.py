@@ -6,7 +6,7 @@ import os
 from contextlib contextmanager
 
 
-''' Iterators 
+''' Iterators
 
 Метод __iter__ возвращает от объекта итератор
 Метод __next__ возврващет следующих элемент
