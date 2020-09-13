@@ -1,5 +1,9 @@
 from itertools import islice
+from itertools import count, cycle, repeat
+from itertools import tee
 from functools import wraps
+import os
+from contextlib contextmanager
 
 
 ''' Iterators 
@@ -222,7 +226,7 @@ def g():
 >>> gen = g()
 >>> next(gen)
 # 42
->>> gen.close()  # кидает GeneratorExit
+>>> gen.close()  # throw GeneratorExit
 # Done
 
 
@@ -238,11 +242,11 @@ def grep(pattern):
 
 
 >>> gen = grep("Gotcha!")
->>> next(gen)                           
+>>> next(gen)
 # Loking for 'Gotcha!'
 >>> gen.send("This line doesn't have waht we're looking for")
->>> gen.send("This one does. Gotcha!")  
-This one does. Gotcha!
+>>> gen.send("This one does. Gotcha!")
+# This one does. Gotcha!
 
 
 # ###################################################################################
@@ -261,12 +265,90 @@ def coroutine(g):
 # ###################################################################################
 
 
-""" Itertools """
+class cd:
+    '''Change current work dir'''
+    def __init__(self, path):
+        self.path = path
+
+    def __enter__(self):
+        self.saved_cwd = os.getcwd()
+        os.chdir(self.path)
+
+    def __exit(self, *exc_info):
+        os.chdir(self.saved_cwd)
+
+
+@contextmanager             # позволяет записать менеджера контекста в виде генератора
+def cd(path):               # __init__
+    '''like cd before'''
+    old_path = os.getcwd()  # __enter__
+    os.chdir(path)
+    try:
+        yield               # --------
+    finally:
+        os.chdir(old_path)  # __exit__
+
+
+# ###################################################################################
+# ###################################################################################
+
+
+''' Itertools '''
+
+
+'''islice
+
+позволяет делать слайсы произволных объектов
+с поддержкой иттерации
+'''
 
 xs = range(10)
+list(islice(xs, 3))        # xs[:3]
+# [1, 2, 3]
+list(islice(xs, 3, None))  # xs[3:]
+# [3, 4, 5, 6, 7, 8, 9]
+list(islice(xs, 3, 8, 2))  # xs[3:8:2]
+# [3, 5, 7]
 
-list(islice(xs, 3))        # [1, 2, 3]
 
-list(islice(xs, 3, None))  # [3, 4, 5, 6, 7, 8, 9]
+# ###################################################################################
 
-list(islice(xs, 3, 8, 2))  # [3, 5, 7]
+
+''' count, cycle, repeat '''
+
+
+def take(iterable, n):
+    return list(islice(iterable, n))
+
+>>> list(take(range(10), 3)
+# [0, 1, 2]
+
+
+>>> take(3, count(0, 5))
+# [0, 5, 10]
+>>> take(3, cycle([1, 2, 3]))  # перечисляет элементы переданного iterable
+# [1, 2, 3]
+>>> take(3, repeat(42, 2))     # повторяет элемент
+# [42, 42]
+
+
+# ###################################################################################
+
+
+''' tee
+
+позволяет дупблировать итератор
+'''
+
+
+it = range(3)
+a, b, c = tee(it, 3)  # принимает иетератор и сколько раз нужно размножить
+>>> list(a), list(b), list(c)
+# ([0, 1, 2], [0, 1, 2], [0, 1, 2])
+
+
+it = iter(range(3))
+a, b = tee(it, 2)
+used = list(it)
+>>> list(a), list(b)
+# ([], [])
