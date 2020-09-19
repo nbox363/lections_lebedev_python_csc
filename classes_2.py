@@ -1,4 +1,5 @@
 from types import MethodType
+from functools import partial
 
 
 ''' descriptor 
@@ -309,3 +310,60 @@ class Function:
         if instance is None:
             return self
         return MethodType(self, instance, owner)
+
+
+# ###################################################################################
+
+
+''' Декораторы staticmethod и classmethod 
+
+staticmethod - делает статический метод, то есть просто функцию внутри класса
+    не связан с классом и экземпляром
+classmethod - принимает не self, а класс
+'''
+
+
+''' staticmethod '''
+
+class staticmethod:
+    def __init__(self, method):
+        self._method = method
+
+    def __get__(self, instance, owner):
+        return self._method
+
+
+class SomeClass:
+    @staticmethod
+    def do_something():
+        print("I'm busy, alright?")
+
+
+>>> Something().do_something()
+# I'm busy, alright?
+
+
+''' classmethod '''
+
+class Setting:
+    @classmethod
+    def read_form(cls, path):
+        return cls()
+
+
+class classmethod:
+    def __init__(self, method):
+        self._method = method
+
+    def __get__(self, instance, owner):
+        return partial(self._method, owner)
+
+
+class Something:
+    @classmethod
+    def do_something(cls):
+        print('Called with', cls)
+
+    
+>>> Something().do_something()
+# Called with <class '__main__.Something'>
