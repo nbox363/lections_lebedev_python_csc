@@ -367,3 +367,90 @@ class Something:
     
 >>> Something().do_something()
 # Called with <class '__main__.Something'>
+
+
+# ###################################################################################
+# ###################################################################################
+
+
+''' Metaclasses 
+
+класс - экземпляр метакласса
+классы типа type
+type - метакласс
+
+конструктор метаклассов принимает 3 аргумента
+    Имя
+    Базовые классы, родители
+    Атрибуты класса
+'''
+
+>>> name, bases, attrs = 'Something', (), {'attr': 42}
+>>> Something = type(name, bases, attrs)
+
+
+# ###################################################################################
+
+
+class Meta(type):
+    def some_method(cls):
+        return 'foobar'
+
+
+class Something(metaclass=Meta):
+    attr = 42
+
+
+>>> type(Something)
+# <class '__main__.Meta'>
+
+>>> Something.some_method
+# <bound method Meta.some_method of <class '__main__.Something'>>
+
+>>> Something().some_method  # нельзя вызвать у экземпляра экземпляра класса метакласса
+# AttributeError
+
+
+# ###################################################################################
+
+
+class Noop:
+    def __new__(cls, *args, **kwargs):
+        print('Creating instance with {} and {}'.format(args, kwargs))
+        instance = super().__new__(cls)  # self
+        return instance
+
+    def __init__(self, *args, **kwargs):
+        print('Initializing with {} and {}'.format(args, kwargs))
+
+
+>>> noop = Noop(42, attrs='value')
+# Creating instance with (42, ) and {attrs='value'}
+# Initializing with (42, ) and {attrs='value'}
+
+
+# ###################################################################################
+# ###################################################################################
+
+
+''' module abc 
+
+Абстрактный класс
+'''
+
+
+import abc
+
+
+class Iterable(metaclass=abc.ABCMeta):
+    @abc.abstractmethod
+    def __iter__(self):
+        pass
+
+
+class Something(Iterable):
+    pass
+
+
+>>> Something()
+# TypeError
