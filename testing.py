@@ -3,7 +3,6 @@ import doctest
 import unittest
 
 
-
 def rle(iterable):
     ''' Пример для тестирования '''
     for item, g in itertools.groupby(iterable):
