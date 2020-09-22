@@ -78,7 +78,23 @@ def matrix_product_v2(X, Y):
 # ###################################################################################
 
 
-def matrix_product_v2(X, Y):
+def matrix_product_v3(X, Y):
+    n_xrows, n_xcols = X.shape
+    n_yrows, n_ycols = Y.shape
+    Z = Matrix.zeros((n_xrows, n_ycols))
+    for i in range(n_xrows):
+        Xi, Zi = X[i], Z[i]
+        for k in range(n_ycols):
+            acc = 0
+            for j in range(n_xcols):
+                acc += Xi[j] * Y[j][k]
+            Zi[k] = acc
+
+
+# ###################################################################################
+
+
+def matrix_product_v4(X, Y):
     ''' замена цилка на выражение генератор '''
     n_xrows, n_xcols = X.shape
     n_yrows, n_ycols = Y.shape
@@ -86,7 +102,7 @@ def matrix_product_v2(X, Y):
     for i in range(n_xrows):
         Xi, Zi = X[i], Z[i]
         for k in range(n_ycols):
-            Z[i][k] = sum(
+            Z[i] = sum(
                 Xi[j] * Y[j][k] for j in range(n_xcols)
             )
     return Z
